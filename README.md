@@ -14,10 +14,8 @@ Suitable cultivation condition of redclaw crayfish is given by "show reference".
 
 
 ### The model
+🚧 Under Construction! 🚧
 
-<demonstrate model in 2D>
 
-
-### Cultivation Suggestion Giving
-
-<demonstrate model in 2D>
+### Giving Cultivation Suggestion
+🚧 Under Construction! 🚧
