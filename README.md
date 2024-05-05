@@ -6,7 +6,7 @@
 ### Introduction
 Red claw crayfish cultivation is difficult, yet valuable. Suitable water condition of redclaw crayfish is demanding and varies with location <sup>[1][2]</sup>.  
 
-In this repository, I demonstrated water quality control algorithm I designed while working at J & KC limited as machine learning engineer. I used multivariant gaussian function to model the water's condition for red claw crayfish cultivation. I also proposed a method to produce cultivation suggestions base on output of this function.  
+In this repository, I demonstrated water quality control algorithm I designed while working at J & KC limited as machine learning engineer. I used multivariant gaussian function to model the water's condition for red claw crayfish cultivation. I also designed algorithm to produce cultivation suggestions base on output of this function.  
 Enjoy!
 
 
@@ -60,23 +60,42 @@ Heres visualization of the model in temperature and pH dimension, with EC and DO
 
 
 
-![Visualization of model](Images/heatmap.png)
+![Visualization of model](Images/heatmap_dot.png)
 
 Temperature and pH are slightly correlated, which is due to manual control of the crayfish farmer. The blue dot is [temp = 25, pH = 8.5, DO = 11, EC = 1550], which is optimal for cultivation (you can also see in the raw data plot, this is within reasonable range). The red dot is [temp = 20, pH = 8.5, DO = 11, EC = 1550], whcih is too cold for crayfish cultivation.
 
 
 
 ### Giving Cultivation Suggestion
-- Core part of this algorithm: flexible method for giving suggestions
-- Demonstrate with 2D example, temperature & DO 
-- Showcase suggestion
-🚧 Under Construction! 🚧
+We can now tell whether the water condition is suitable or not, but we can go further. Here I show how we could use the spirit of greedy algorithm for suggestion. 
+
+I first colelct a set of cultivation activity that the fish farmer would do, e.g:
+- Cover the pond when water is too hot
+- Turn on oxygen pump if DO is low
+- Add enzymes if pH is too low
+
+For each action, model them as a unit vector, pointing towards the direction of its change to water status. For example, the action "covering the pond" would be represented by the vector [-1 0 0 0], meaning that covering the pond would decrease the temperature. Plotting them onto the heatmap:
+
+![heatmap suggestions](Images/heatmap_arrow.png)
+
+The red arrow represent action of adding enzymes, and blue arrow represent covering the pond.
+
+Next, we need the gradient of the score function. Differentiationg the MVG expression above gives (noting that covariance matrix is positive semidefinite):
+
+$$ f'(x) = -\Sigma^{-1}\cdot{}x\cdot{}f(x)$$
+
+In practice, we don't need to multiply by f(x), the score of water condition, as we only need the direction of the gradient. Plotting gradient onto the heatmap:
+
+Finally, we can find the inner product similarity of the gradient to each action, and return action with highest similarity as suggestion to user. In this case, the suggestion would be (surprise!) "cover the pond to cool water down", demonstrated in the notebook.
+
+
 
 ### Discussion
-- Auto capture correlations between water quality metrics
+Here are some points for discussion and possible improvements:
+- The algorithm auto capture correlations between water quality metrics
 - Convenient way to provide cultivation suggestions
-- Future work: include time encoding into it (e.g. time in the year, in day)
-- Future work: base on magnitude, calculate metric for actions (e.g. covver pond for a period of time, add certain dosage of chemicals to adjust water properties)
+- Future work: include positional encoding into time dimension of water data  (e.g. time in the year, in day)
+- Future work: Also calculate metric for actions (e.g. covver pond for a period of time, add certain dosage of chemicals to adjust water properties)
 
 
 
